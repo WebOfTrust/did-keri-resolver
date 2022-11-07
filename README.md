@@ -1,2 +1,2 @@
-# did-keri-resolver
+# dkr
 did:keri DID Resolver Reference Implementation
