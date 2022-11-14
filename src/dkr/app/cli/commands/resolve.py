@@ -59,8 +59,8 @@ class Resolver(doing.DoDoer):
         while self.hby.db.roobi.get(keys=(oobi,)) is None:
             _ = yield tock
 
-        didres, diddoc, didmeta = didding.generateDIDDoc(self.hby, did=self.did, aid=aid, oobi=oobi)
-        data = json.dumps(diddoc, indent=2)
+        result = didding.generateDIDDoc(self.hby, did=self.did, aid=aid, oobi=oobi)
+        data = json.dumps(result, indent=2)
 
         print(data)
         self.remove(self.toRemove)

@@ -131,8 +131,8 @@ class OobiIterable:
         if self.hby.db.roobi.get(keys=(self.oobi,)) is None:
             return b''
 
-        didres, diddoc, didmeta = didding.generateDIDDoc(self.hby, self.aid, self.did, self.oobi)
-        self.data = json.dumps(diddoc, indent=2)
+        result = didding.generateDIDDoc(self.hby, self.aid, self.did, self.oobi)
+        self.data = json.dumps(result, indent=2)
 
         self.finished = True
         return self.data.encode("utf-8")
