@@ -6,6 +6,8 @@ kara.app.commands module
 import multicommand
 import logging
 
+from keri.app import directing
+
 from dkr.app.cli import commands
 from keri import help
 
@@ -19,11 +21,13 @@ def main():
     args = parser.parse_args()
 
     try:
-        args.handler(args)
+        doers = args.handler(args)
+        directing.runController(doers=doers, expire=0.0)
+
     except Exception as ex:
-        print(f"ERR: {ex}")
-        return -1
-        # raise ex
+        # print(f"ERR: {ex}")
+        # return -1
+        raise ex
 
 
 if __name__ == "__main__":

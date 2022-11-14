@@ -70,4 +70,4 @@ def launch(args, expire=0.0):
     doers += resolving.setup(hby, httpPort=httpPort)
 
     print(f"did:keri Method Resolver listening on {httpPort}")
-    directing.runController(doers=doers, expire=expire)
+    return doers

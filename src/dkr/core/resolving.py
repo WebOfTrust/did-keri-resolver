@@ -12,7 +12,6 @@ from hio.core import http
 from keri.app import oobiing
 from keri.db import basing
 from keri.help import helping
-from multibase import encode as mbencode
 
 
 def setup(hby, *, httpPort):
@@ -132,42 +131,7 @@ class OobiIterable:
         if self.hby.db.roobi.get(keys=(self.oobi,)) is None:
             return b''
 
-        obr = self.hby.db.roobi.get(keys=(self.oobi,))
-        if obr.state == oobiing.Result.failed:
-            print("asdfasdfasdf")
-            msg = dict(msg=f"OOBI resolution for did {self.did} failed.")
-            data = json.dumps(msg)
-            return bytes(data)
-
-        kever = self.hby.kevers[self.aid]
-        keys = [mbencode('base58btc', verfer.raw) for verfer in kever.verfers]
-        vms = []
-        for idx, key in enumerate(keys):
-            vms.append(dict(
-                id=f"{self.did}#key-{idx}",
-                type="Ed25519VerificationKey2020",
-                controller=self.did,
-                publicKeyMultibase=key.decode("utf-8")
-            ))
-
-        x = [(keys[1], loc.url) for keys, loc in
-             self.hby.db.locs.getItemIter(keys=(self.aid,)) if loc.url]
-
-        services = []
-        for idx, eid in enumerate(kever.wits):
-            keys = (eid,)
-            for (aid, scheme), loc in self.hby.db.locs.getItemIter(keys):
-                services.append(dict(
-                    id=f"{self.did}#witness-{idx}-{scheme}",
-                    type="keri-mailbox",
-                    serviceEndpoint=loc.url
-                ))
-
-        diddoc = dict(
-            id=self.did,
-            verificationMethod=vms,
-            service=services
-        )
+        didres, diddoc, didmeta = didding.generateDIDDoc(self.hby, self.aid, self.did, self.oobi)
         self.data = json.dumps(diddoc, indent=2)
 
         self.finished = True
