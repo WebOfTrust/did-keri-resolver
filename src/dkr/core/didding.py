@@ -1,6 +1,7 @@
 import json
 import re
 
+from keri.help import helping
 from multibase import encode as mbencode
 
 from keri.app import oobiing
@@ -56,12 +57,21 @@ def generateDIDDoc(hby, did, aid, oobi):
                 type="keri-mailbox",
                 serviceEndpoint=loc.url
             ))
-    didResolutionMetadata = dict()
-    didDocMetadata = dict()
+    didResolutionMetadata = dict(
+        contentType="application/did+json",
+        retrieved=helping.nowIso8601()
+    )
+    didDocumentMetadata = dict()
     diddoc = dict(
         id=did,
         verificationMethod=vms,
         service=services
     )
 
-    return didResolutionMetadata, diddoc, didDocMetadata
+    result = dict(
+        didDocument=diddoc,
+        didResolutionMetadata=didResolutionMetadata,
+        didDocumentMetadata=didDocumentMetadata
+    )
+
+    return result
