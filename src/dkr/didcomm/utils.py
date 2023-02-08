@@ -14,13 +14,12 @@ import json
 
 
 '''
-Proof of concept of DIDComm packing and unpacking with did:keri
+Utilities for DIDComm packing and unpacking using did:keri as alternative to Peer DID
 - Use SICPA didcomm-python library
-- Authcryypt message
-- AID is Ed25519 and derive X25519 keys from same private
+- Authcryypt message only
+- AID is Ed25519 and derive X25519 key pair from same private key
 - Transferable AID but with no next key that makes it non transferable (no key rotations)
 '''
-
 
 def createKeriDid():
     salt = coring.Salter()
@@ -49,7 +48,7 @@ def createKeriDid():
     }
 
 def validateLongDid(long_did):
-    # TODO make URL parsing safer
+    # TODO validate URL and make parsing safer
     did = long_did.split('?')[0]
     kelb64 = long_did.split('=')[1]+"=="
     kel_decoded = json.loads(base64.urlsafe_b64decode(kelb64))
@@ -90,11 +89,11 @@ class SecretsResolverInMemory(SecretsResolver):
     async def get_keys(self, kids: List[str]) -> List[str]:
         return kids
 
-
 class DidKeriResolver(DIDResolver):
     def __init__(self, store: dict):
         self._store = store
     async def resolve(self, did: DID) -> DIDDoc:
+        # TODO validate URL and make parsing safer
         short_did = did.split('?')[0]
         if len(did.split('=')) > 1:  
             kelb64 = did.split('=')[1]+"=="
