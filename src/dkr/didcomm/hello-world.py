@@ -8,12 +8,15 @@ import asyncio
 alice = createKeriDid()
 print("Alice's DID:", alice['did'])
 print("Alice's Long DID:", alice['long_did'],"\n")
+
 bob = createKeriDid()
 print("Bob's DID:", bob['did'])
 print("Bob's Long DID:", bob['long_did'],"\n")
 
-# Compare with a Peer DID length
 print("Compare length with Peer DID: did:peer:2.Vz6MkfiT7uT2EQnuNhGP2xxNsh2v7seoV3fzZWRpydJnF3K6z.Ez6LSfpsWUKP7g4LGTpXFPWZzThQtG1VuQqxtToKYtkXdRdc8.SeyJpZCI6IiNzZXJ2aWNlLTEiLCJ0IjoiZG0iLCJzIjoiZGlkOnBlZXI6Mi5FejZMU2U3U3FCUmJmWEdFNXJpVEZYYU5zZ2dWUFB6YThtNXdyR21ON0dRY0d5dHI2LlZ6Nk1ra3dmNWhWcUJVYXhFU3YxVHhra0pIQWNKRldnTXROY1g2Q1pyRkZpZllNQTkuU2V5SnBaQ0k2SW01bGR5MXBaQ0lzSW5RaU9pSmtiU0lzSW5NaU9pSm9kSFJ3Y3pvdkwyMWxaR2xoZEc5eUxuSnZiM1J6YVdRdVkyeHZkV1FpTENKaElqcGJJbVJwWkdOdmJXMHZkaklpWFgwIn","\n")
+
+print("Alice's long DID validation:", validateLongDid(alice['long_did']))
+print("Bob's long DID validation:", validateLongDid(bob['long_did']),"\n")
 
 store = {
     alice['did']: alice,
@@ -56,5 +59,37 @@ bob_message_unpacked = asyncio.run( unpack(
 ))
 print('3-Bob decrypts the message:', bob_message_unpacked.message.body,"\n")
 
-print("Alice's long DID validation:", validateLongDid(alice['long_did']))
-print("Bob's long DID validation:", validateLongDid(bob['long_did']))
+# Bob creates a basic message response
+bob_message =  Message(
+    id = "124",
+    type = "https://didcomm.org/basicmessage/2.0/message",
+    body = {'content': 'Hello Alice!'},
+)
+print('4-Bob creates a response using short DIDs:',bob_message.body,"\n")
+
+# Bob encrypts the message for Bob
+bob_message_packed = asyncio.run( pack_encrypted(
+    resolvers_config = ResolversConfig(
+        secrets_resolver = secrets_resolver,
+        did_resolver = did_resolver
+    ),
+    message = bob_message,
+    frm = alice['did'],
+    to = bob['did'],
+    sign_frm = None,
+    pack_config = PackEncryptedConfig(protect_sender_id=False)
+))
+print('5-Bob encrypts the message for Alice:')
+print(bob_message_packed.packed_msg,"\n")
+
+# Alice decrypts the message
+alice_message_unpacked = asyncio.run( unpack(
+    resolvers_config=ResolversConfig(
+        secrets_resolver=secrets_resolver,
+        did_resolver=did_resolver
+    ),
+    packed_msg= bob_message_packed.packed_msg
+))
+print('6-Alice decrypts the message with short DIDs:', alice_message_unpacked.message.body,"\n")
+
+
