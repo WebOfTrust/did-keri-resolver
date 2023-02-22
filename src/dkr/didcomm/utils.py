@@ -2,7 +2,7 @@ from keri.core import eventing, coring
 
 from didcomm.common.types import DID, VerificationMethodType, VerificationMaterial, VerificationMaterialFormat
 from didcomm.common.resolvers import SecretsResolver
-from didcomm.did_doc.did_doc import DIDDoc, VerificationMethod
+from didcomm.did_doc.did_doc import DIDDoc, VerificationMethod, DIDCommService
 from didcomm.did_doc.did_resolver import DIDResolver
 from didcomm.secrets.secrets_resolver_demo import  Secret
 
@@ -11,6 +11,7 @@ from typing import Optional, List
 import pysodium
 import base64
 import json
+from pprint import pp
 
 
 '''
@@ -26,7 +27,7 @@ def createKeriDid():
     signerEd25519 = salt.signer(transferable=True, temp=True)
 
     X25519_pubkey = pysodium.crypto_sign_pk_to_box_pk(signerEd25519.verfer.raw)
-    X25519_pubkey_qb64 = ('C'+base64.b64encode(X25519_pubkey).decode('utf-8'))[:-1]
+    X25519_pubkey_qb64 = ('C'+base64.urlsafe_b64encode(X25519_pubkey).decode('utf-8'))[:-1]
 
     serder = eventing.incept(
         keys=[signerEd25519.verfer.qb64], 
@@ -39,7 +40,9 @@ def createKeriDid():
 
     did = 'did:keri:'+serder.ked['i']
     kelb64 = base64.urlsafe_b64encode(bytes(json.dumps(serder.ked), 'utf-8')).decode('utf-8')
-    long_did = did+'?kel='+kelb64
+    long_did = did+'?icp='+kelb64
+
+    pp(serder.ked)
 
     return {
         'did': did,
@@ -61,12 +64,25 @@ class SecretsResolverInMemory(SecretsResolver):
 
     async def get_key(self, kid: str) -> Optional[Secret]:
         
-        did = kid.split('#')[0]
+        did, kident = kid.split('#')
+
         signer = self._store[did]['signer']
         X25519_pubkey = pysodium.crypto_sign_pk_to_box_pk(signer.verfer.raw)
-        X25519_pubkey_b64 = base64.b64encode(X25519_pubkey).decode('utf-8')
+        X25519_pubkey_b64 = base64.urlsafe_b64encode(X25519_pubkey).decode('utf-8')
         X25519_prikey = pysodium.crypto_sign_sk_to_box_sk(signer.raw + signer.verfer.raw)
-        X25519_prikey_b64 = base64.b64encode(X25519_prikey).decode('utf-8')
+        X25519_prikey_b64 = base64.urlsafe_b64encode(X25519_prikey).decode('utf-8')
+
+        Ed25519_pubkey_b64 = signer.verfer.qb64[1:]
+        Ed25519_prikey_b64 = signer.qb64[1:]
+        # Ed25519_prikey_b64_2 = base64.urlsafe_b64encode(signer.verfer.raw).decode('utf-8')
+
+        # print(X25519_prikey_b64)
+        # print(X25519_pubkey_b64)
+        # print( Ed25519_prikey_b64)
+        # print( Ed25519_prikey_b64_2)
+        # print(Ed25519_pubkey_b64)
+        # print()
+
 
         secret = Secret(
                 kid= kid,
@@ -79,6 +95,13 @@ class SecretsResolverInMemory(SecretsResolver):
                             'crv': 'X25519',
                             'd': X25519_prikey_b64,
                             'x': X25519_pubkey_b64,
+                            'kid': kid
+                        } if kident == "key-1" else 
+                        {
+                            'kty': 'OKP',
+                            'crv': 'Ed25519',
+                            'd': Ed25519_prikey_b64,
+                            'x': Ed25519_pubkey_b64,
                             'kid': kid
                         }
                     )
@@ -105,7 +128,7 @@ class DidKeriResolver(DIDResolver):
         return DIDDoc(
             did=did,
             key_agreement_kids = [short_did+'#key-1'],
-            authentication_kids = [],
+            authentication_kids = [short_did+'#key-2'],
             verification_methods = [
                 VerificationMethod(
                     id = short_did+'#key-1',
@@ -119,7 +142,27 @@ class DidKeriResolver(DIDResolver):
                                     'x': ked['a'][0]['e'][1:]
                                 })
                     )
-                )
+                ),
+                VerificationMethod(
+                        id = short_did+'#key-2',
+                        type = VerificationMethodType.JSON_WEB_KEY_2020,
+                        controller = did,
+                        verification_material = VerificationMaterial(
+                            format = VerificationMaterialFormat.JWK,
+                            value = json.dumps({
+                                        'kty': 'OKP',
+                                        'crv': 'Ed25519',
+                                        'x': ked['k'][0][1:]
+                                    })
+                        )
+                    )    
             ],
-             didcomm_services = []
+            didcomm_services = [
+                DIDCommService(
+                    id='endpoint-1',
+                    service_endpoint=ked['a'][1]['se'],
+                    routing_keys=[],
+                    accept=["didcomm/v2"]
+                )
+            ]
         )
