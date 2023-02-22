@@ -92,4 +92,4 @@ alice_message_unpacked = asyncio.run( unpack(
 ))
 print('6-Alice decrypts the message with short DIDs:', alice_message_unpacked.message.body,"\n")
 
-
+print(asyncio.run(did_resolver.resolve(alice['did'])))
