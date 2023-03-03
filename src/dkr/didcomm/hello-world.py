@@ -4,6 +4,7 @@ from didcomm.unpack import unpack
 from didcomm.common.resolvers import ResolversConfig
 from didcomm.pack_encrypted import pack_encrypted, PackEncryptedConfig
 import asyncio
+import json
 
 alice = createKeriDid()
 print("Alice's DID:", alice['did'])
@@ -67,19 +68,19 @@ bob_message =  Message(
 )
 print('4-Bob creates a response using short DIDs:',bob_message.body,"\n")
 
-# Bob encrypts the message for Bob
+# Bob encrypts the message for Alice
 bob_message_packed = asyncio.run( pack_encrypted(
     resolvers_config = ResolversConfig(
         secrets_resolver = secrets_resolver,
         did_resolver = did_resolver
     ),
     message = bob_message,
-    frm = alice['did'],
-    to = bob['did'],
-    sign_frm = None,
+    frm = bob['did'],
+    to = alice['did'],
+    sign_frm = bob['did'],
     pack_config = PackEncryptedConfig(protect_sender_id=False)
 ))
-print('5-Bob encrypts the message for Alice:')
+print('5-Bob encrypts and sign the message for Alice:')
 print(bob_message_packed.packed_msg,"\n")
 
 # Alice decrypts the message

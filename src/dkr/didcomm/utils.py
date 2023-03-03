@@ -27,7 +27,10 @@ def createKeriDid():
     signerEd25519 = salt.signer(transferable=True, temp=True)
 
     X25519_pubkey = pysodium.crypto_sign_pk_to_box_pk(signerEd25519.verfer.raw)
-    X25519_pubkey_qb64 = ('C'+base64.urlsafe_b64encode(X25519_pubkey).decode('utf-8'))[:-1]
+    # Manual CESR coding
+    X25519_pubkey_qb64 = 'C'+ (base64.urlsafe_b64encode(bytes([0]) + X25519_pubkey).decode('utf-8'))[1:]
+    # Or using karipy
+    X25519_pubkey_qb64 = coring.Matter(raw = X25519_pubkey, code=coring.MtrDex.X25519).qb64
 
     serder = eventing.incept(
         keys=[signerEd25519.verfer.qb64], 
@@ -42,7 +45,7 @@ def createKeriDid():
     kelb64 = base64.urlsafe_b64encode(bytes(json.dumps(serder.ked), 'utf-8')).decode('utf-8')
     long_did = did+'?icp='+kelb64
 
-    pp(serder.ked)
+    # pp(serder.ked)
 
     return {
         'did': did,
@@ -72,17 +75,11 @@ class SecretsResolverInMemory(SecretsResolver):
         X25519_prikey = pysodium.crypto_sign_sk_to_box_sk(signer.raw + signer.verfer.raw)
         X25519_prikey_b64 = base64.urlsafe_b64encode(X25519_prikey).decode('utf-8')
 
-        Ed25519_pubkey_b64 = signer.verfer.qb64[1:]
-        Ed25519_prikey_b64 = signer.qb64[1:]
-        # Ed25519_prikey_b64_2 = base64.urlsafe_b64encode(signer.verfer.raw).decode('utf-8')
-
-        # print(X25519_prikey_b64)
-        # print(X25519_pubkey_b64)
-        # print( Ed25519_prikey_b64)
-        # print( Ed25519_prikey_b64_2)
-        # print(Ed25519_pubkey_b64)
-        # print()
-
+        Ed25519_pubkey_raw = signer.verfer.raw
+        Ed25519_pubkey_b64 = base64.urlsafe_b64encode(Ed25519_pubkey_raw).decode('utf-8')
+        
+        Ed25519_prikey_raw = signer.raw
+        Ed25519_prikey_b64 = base64.urlsafe_b64encode(Ed25519_prikey_raw).decode('utf-8')
 
         secret = Secret(
                 kid= kid,
@@ -125,6 +122,16 @@ class DidKeriResolver(DIDResolver):
         else:
             ked = self._store[short_did]['ked']
 
+        # Manual CESR Decoding
+        ed25519_pubkey_qb64 = ked['k'][0]
+        ed25519_pubkey_b64 = "A" + ed25519_pubkey_qb64[1:]
+        ed25519_pubkey_raw = base64.urlsafe_b64decode(ed25519_pubkey_b64)[1:]
+        x1 = base64.urlsafe_b64encode(ed25519_pubkey_raw).decode('utf-8')
+        # Or using keripy:
+        x1 = base64.urlsafe_b64encode(coring.Matter(qb64=ked['k'][0]).raw).decode('utf-8')
+
+        x2 = base64.urlsafe_b64encode(coring.Matter(qb64=ked['a'][0]['e']).raw).decode('utf-8')
+
         return DIDDoc(
             did=did,
             key_agreement_kids = [short_did+'#key-1'],
@@ -139,7 +146,7 @@ class DidKeriResolver(DIDResolver):
                         value = json.dumps({
                                     'kty': 'OKP',
                                     'crv': 'X25519',
-                                    'x': ked['a'][0]['e'][1:]
+                                    'x': x2
                                 })
                     )
                 ),
@@ -152,7 +159,7 @@ class DidKeriResolver(DIDResolver):
                             value = json.dumps({
                                         'kty': 'OKP',
                                         'crv': 'Ed25519',
-                                        'x': ked['k'][0][1:]
+                                        'x': x1
                                     })
                         )
                     )    
