@@ -1,3 +1,9 @@
+# -*- encoding: utf-8 -*-
+"""
+dkr.core.didding module
+
+"""
+
 import json
 import re
 
@@ -27,12 +33,13 @@ def parseDID(did):
     return aid, oobi
 
 
-def generateDIDDoc(hby, did, aid, oobi):
-    obr = hby.db.roobi.get(keys=(oobi,))
-    if obr.state == oobiing.Result.failed:
-        msg = dict(msg=f"OOBI resolution for did {did} failed.")
-        data = json.dumps(msg)
-        return bytes(data)
+def generateDIDDoc(hby, did, aid, oobi=None):
+    if oobi is not None:
+        obr = hby.db.roobi.get(keys=(oobi,))
+        if obr is None or obr.state == oobiing.Result.failed:
+            msg = dict(msg=f"OOBI resolution for did {did} failed.")
+            data = json.dumps(msg)
+            return data.encode("utf-8")
 
     kever = hby.kevers[aid]
     keys = [mbencode('base58btc', verfer.raw) for verfer in kever.verfers]
@@ -68,10 +75,10 @@ def generateDIDDoc(hby, did, aid, oobi):
         service=services
     )
 
-    result = dict(
-        didDocument=diddoc,
-        didResolutionMetadata=didResolutionMetadata,
-        didDocumentMetadata=didDocumentMetadata
-    )
+    # result = dict(
+    #     didDocument=diddoc,
+    #     didResolutionMetadata=didResolutionMetadata,
+    #     didDocumentMetadata=didDocumentMetadata
+    # )
 
-    return result
+    return diddoc

@@ -6,12 +6,12 @@ dkr.core.serving module
 import json
 
 import falcon
-from dkr.core import didding
 from hio.base import doing
 from hio.core import http
-from keri.app import oobiing
 from keri.db import basing
 from keri.help import helping
+
+from dkr.core import didding
 
 
 def setup(hby, *, httpPort):
