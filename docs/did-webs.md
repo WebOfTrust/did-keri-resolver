@@ -1,5 +1,8 @@
 
 # did:webS - A More Secure did:web, a More Discoverable did:keri
+
+[![hackmd-github-sync-badge](https://hackmd.io/dbB7E1bPSPGZ_Ow5S_9pmg/badge)](https://hackmd.io/dbB7E1bPSPGZ_Ow5S_9pmg)
+
 did:webS is a new DID Method that intends to combine the security of the Key Event Receipt Infrastruture (KERI) with
 the ease of use and discoverability of did:web.  The intention is to rely on KERI key management to create and manage
 identifiers (called Autonomic IDentifiers (AIDs) in KERI) and expose them as DIDs that look and behave like did:web
