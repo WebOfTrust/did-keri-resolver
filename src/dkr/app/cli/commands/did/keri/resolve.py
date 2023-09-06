@@ -26,21 +26,23 @@ parser.add_argument('--base', '-b', help='additional optional prefix to file loc
 parser.add_argument('--passcode', help='22 character encryption passcode for keystore (is not saved)',
                     dest="bran", default=None)  # passcode => bran
 parser.add_argument("--did", "-d", help="DID to resolve", required=True)
+parser.add_argument("--oobi", "-o", help="OOBI to use for resolving the DID", required=False)
 
 
 def handler(args):
-    res = Resolver(name=args.name, base=args.base, bran=args.bran, did=args.did)
+    res = Resolver(name=args.name, base=args.base, bran=args.bran, did=args.did, oobi=args.oobi)
     return [res]
 
 
 class Resolver(doing.DoDoer):
 
-    def __init__(self, name, base, bran, did):
+    def __init__(self, name, base, bran, did, oobi):
 
         self.hby = existing.setupHby(name=name, base=base, bran=bran)
         hbyDoer = habbing.HaberyDoer(habery=self.hby)  # setup doer
         obl = oobiing.Oobiery(hby=self.hby)
         self.did = did
+        self.oobi = oobi
 
         self.toRemove = [hbyDoer] + obl.doers
         doers = list(self.toRemove) + [doing.doify(self.resolve)]
@@ -51,15 +53,15 @@ class Resolver(doing.DoDoer):
         self.tock = tock
         _ = (yield self.tock)
 
-        aid, oobi = didding.parseDID(self.did)
+        aid = didding.parseDIDKeri(self.did)
         obr = basing.OobiRecord(date=helping.nowIso8601())
         obr.cid = aid
-        self.hby.db.oobis.pin(keys=(oobi,), val=obr)
+        self.hby.db.oobis.pin(keys=(self.oobi,), val=obr)
 
-        while self.hby.db.roobi.get(keys=(oobi,)) is None:
+        while self.hby.db.roobi.get(keys=(self.oobi,)) is None:
             _ = yield tock
 
-        result = didding.generateDIDDoc(self.hby, did=self.did, aid=aid, oobi=oobi)
+        result = didding.generateDIDDoc(self.hby, did=self.did, aid=aid, oobi=self.oobi)
         data = json.dumps(result, indent=2)
 
         print(data)
