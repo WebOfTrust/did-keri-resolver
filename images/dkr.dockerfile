@@ -1,18 +1,12 @@
-# syntax=docker/dockerfile:1
-FROM gleif/base:0.1.0
-MAINTAINER "GLEIF"
+FROM gleif/keri:latest
 
-WORKDIR /usr/local/var/
-RUN git clone -b development https://github.com/WebOfTrust/keripy
 
-WORKDIR /usr/local/var/keripy
-RUN pip install -r requirements.txt
-RUN pip install -e .
 
-WORKDIR /usr/local/var/keripy
+WORKDIR /usr/local/var
 
-WORKDIR /usr/local/var/
-RUN git clone -b dev https://github.com/WebOfTrust/kara
+RUN mkdir did-keri-resolver
+COPY . /usr/local/var/did-keri-resolver
 
-WORKDIR /usr/local/var/kara
+WORKDIR /usr/local/var/did-keri-resolver
+
 RUN pip install -r requirements.txt

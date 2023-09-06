@@ -10,7 +10,7 @@ from keri.app.cli.common import existing
 
 from dkr.core import resolving
 
-parser = argparse.ArgumentParser(description='Launch did:keri DID Method Resolver reference implementation')
+parser = argparse.ArgumentParser(description='Expose did:keri resolver as an HTTP web service')
 parser.set_defaults(handler=lambda args: launch(args),
                     transferable=True)
 parser.add_argument('-p', '--http',
@@ -69,5 +69,5 @@ def launch(args, expire=0.0):
     doers = obl.doers + [hbyDoer]
     doers += resolving.setup(hby, httpPort=httpPort)
 
-    print(f"did:keri Method Resolver listening on {httpPort}")
+    print(f"did:web resolver web service listening on {httpPort}")
     return doers
