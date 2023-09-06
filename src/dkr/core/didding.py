@@ -13,13 +13,13 @@ from multibase import encode as mbencode
 from keri.app import oobiing
 from keri.core import coring
 
-DID_RE = re.compile('\\Adid:keri:(?P<aid>[^:]+):(?P<oobi>.+)\\Z', re.IGNORECASE)
+DID_KERI_RE = re.compile('\\Adid:keri:(?P<aid>[^:]+)\\Z', re.IGNORECASE)
+DID_WEBS_RE = re.compile('\\Adid:webs:(?P<path>.+):(?P<aid>[^:]+)\\Z', re.IGNORECASE)
 
-
-def parseDID(did):
-    match = DID_RE.match(did)
+def parseDIDKeri(did):
+    match = DID_KERI_RE.match(did)
     if match is None:
-        raise ValueError(f"{did} is not a valid did:keri DID")
+        raise ValueError(f"{did} is not a valid did:webs DID")
 
     aid = match.group("aid")
 
@@ -28,9 +28,21 @@ def parseDID(did):
     except Exception as e:
         raise ValueError(f"{aid} is an invalid AID")
 
-    oobi = match.group("oobi")
+    return aid
 
-    return aid, oobi
+def parseDIDWebs(did):
+    match = DID_WEBS_RE.match(did)
+    if match is None:
+        raise ValueError(f"{did} is not a valid did:webs DID")
+
+    aid = match.group("aid")
+
+    try:
+        _ = coring.Prefixer(qb64=aid)
+    except Exception as e:
+        raise ValueError(f"{aid} is an invalid AID")
+
+    return aid
 
 
 def generateDIDDoc(hby, did, aid, oobi=None):
