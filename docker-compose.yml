@@ -16,6 +16,8 @@ services:
         build:
             context: .
             dockerfile: ./images/did-webs-service.dockerfile
+        depends_on:
+            - dkr
         image: gleif/did-webs-service:latest
         ports:
             - 7676:7676
@@ -26,6 +28,8 @@ services:
         build:
             context: .
             dockerfile: ./images/did-webs-resolver-service.dockerfile
+        depends_on:
+            - dkr
         image: gleif/did-webs-resolver-service:latest
         ports:
             - 7677:7677
@@ -36,6 +40,8 @@ services:
         build:
             context: .
             dockerfile: ./images/did-keri-resolver-service.dockerfile
+        depends_on:
+            - dkr
         image: gleif/did-keri-resolver-service:latest
         ports:
             - 7678:7678
