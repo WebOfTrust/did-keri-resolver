@@ -15,17 +15,21 @@ parser.set_defaults(handler=lambda args: launch(args),
                     transferable=True)
 parser.add_argument('-p', '--http',
                     action='store',
-                    default=7676,
-                    help="Port on which to listen for OOBI requests.  Defaults to 9723")
+                    default=7678,
+                    help="Port on which to listen for did:keri resolution requests.  Defaults to 7678")
 parser.add_argument('-n', '--name',
                     action='store',
                     default="dkr",
-                    help="Name of controller. Default is kara.")
+                    help="Name of controller. Default is dkr.")
 parser.add_argument('--base', '-b', help='additional optional prefix to file location of KERI keystore',
                     required=False, default="")
 parser.add_argument('--passcode', help='22 character encryption passcode for keystore (is not saved)',
                     dest="bran", default=None)  # passcode => bran
-parser.add_argument("--config-dir", "-c", dest="configDir", help="directory override for configuration data")
+parser.add_argument("--config-dir",
+                    "-c",
+                    dest="configDir",
+                    help="directory override for configuration data",
+                    default=None)
 parser.add_argument('--config-file',
                     dest="configFile",
                     action='store',
@@ -69,5 +73,5 @@ def launch(args, expire=0.0):
     doers = obl.doers + [hbyDoer]
     doers += resolving.setup(hby, httpPort=httpPort)
 
-    print(f"did:web resolver web service listening on {httpPort}")
+    print(f"Launched did:keri resolver as an HTTP web service on {httpPort}")
     return doers

@@ -20,7 +20,7 @@ parser.set_defaults(handler=lambda args: handler(args),
 parser.add_argument('-n', '--name',
                     action='store',
                     default="dkr",
-                    help="Name of controller. Default is kara.")
+                    help="Name of controller. Default is dkr.")
 parser.add_argument('--base', '-b', help='additional optional prefix to file location of KERI keystore',
                     required=False, default="")
 parser.add_argument('--passcode', help='22 character encryption passcode for keystore (is not saved)',
