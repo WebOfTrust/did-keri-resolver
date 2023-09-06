@@ -27,6 +27,7 @@ parser.add_argument('--passcode', help='22 character encryption passcode for key
                     dest="bran", default=None)  # passcode => bran
 parser.add_argument("--did", "-d", help="DID to resolve", required=True)
 parser.add_argument("--oobi", "-o", help="OOBI to use for resolving the DID", required=False)
+parser.add_argument("--metadata", "-m", help="Whether to include metadata (True), or only return the DID document (False)", type=bool, required=False, default=False)
 
 
 def handler(args):
