@@ -100,5 +100,5 @@ def launch(args):
 
     webbing.setup(app, hby=hby, cf=cf)
 
-    print(f"did:web Server running on: {httpPort}")
+    print(f"Launched web server capable of serving KERI AIDs as did:webs DIDs on: {httpPort}")
     return doers
