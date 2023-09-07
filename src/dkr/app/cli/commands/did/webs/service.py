@@ -14,13 +14,13 @@ from keri.app.cli.common import existing
 
 from dkr.core import webbing
 
-parser = argparse.ArgumentParser(description='Launch web server capable of serving KERI AIDs as did:web DIDs')
+parser = argparse.ArgumentParser(description='Launch web server capable of serving KERI AIDs as did:webs and did:web DIDs')
 parser.set_defaults(handler=lambda args: launch(args),
                     transferable=True)
 parser.add_argument('-p', '--http',
                     action='store',
                     default=7676,
-                    help="Port on which to listen for did:web requests")
+                    help="Port on which to listen for did:webs requests")
 parser.add_argument('-n', '--name',
                     action='store',
                     default="dkr",
@@ -100,5 +100,5 @@ def launch(args):
 
     webbing.setup(app, hby=hby, cf=cf)
 
-    print(f"did:web Server running on: {httpPort}")
+    print(f"Launched web server capable of serving KERI AIDs as did:webs DIDs on: {httpPort}")
     return doers

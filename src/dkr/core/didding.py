@@ -13,13 +13,13 @@ from multibase import encode as mbencode
 from keri.app import oobiing
 from keri.core import coring
 
-DID_RE = re.compile('\\Adid:keri:(?P<aid>[^:]+):(?P<oobi>.+)\\Z', re.IGNORECASE)
+DID_KERI_RE = re.compile('\\Adid:keri:(?P<aid>[^:]+)\\Z', re.IGNORECASE)
+DID_WEBS_RE = re.compile('\\Adid:webs:(?P<path>.+):(?P<aid>[^:]+)\\Z', re.IGNORECASE)
 
-
-def parseDID(did):
-    match = DID_RE.match(did)
+def parseDIDKeri(did):
+    match = DID_KERI_RE.match(did)
     if match is None:
-        raise ValueError(f"{did} is not a valid did:keri DID")
+        raise ValueError(f"{did} is not a valid did:webs DID")
 
     aid = match.group("aid")
 
@@ -28,12 +28,24 @@ def parseDID(did):
     except Exception as e:
         raise ValueError(f"{aid} is an invalid AID")
 
-    oobi = match.group("oobi")
+    return aid
 
-    return aid, oobi
+def parseDIDWebs(did):
+    match = DID_WEBS_RE.match(did)
+    if match is None:
+        raise ValueError(f"{did} is not a valid did:webs DID")
+
+    aid = match.group("aid")
+
+    try:
+        _ = coring.Prefixer(qb64=aid)
+    except Exception as e:
+        raise ValueError(f"{aid} is an invalid AID")
+
+    return aid
 
 
-def generateDIDDoc(hby, did, aid, oobi=None):
+def generateDIDDoc(hby, did, aid, oobi=None, metadata=None):
     if oobi is not None:
         obr = hby.db.roobi.get(keys=(oobi,))
         if obr is None or obr.state == oobiing.Result.failed:
@@ -55,30 +67,33 @@ def generateDIDDoc(hby, did, aid, oobi=None):
     x = [(keys[1], loc.url) for keys, loc in
          hby.db.locs.getItemIter(keys=(aid,)) if loc.url]
 
-    services = []
+    witnesses = []
     for idx, eid in enumerate(kever.wits):
         keys = (eid,)
         for (aid, scheme), loc in hby.db.locs.getItemIter(keys):
-            services.append(dict(
-                id=f"{did}#witness-{idx}-{scheme}",
-                type="keri-mailbox",
-                serviceEndpoint=loc.url
+            witnesses.append(dict(
+                idx=idx,
+                scheme=scheme,
+                url=loc.url
             ))
     didResolutionMetadata = dict(
         contentType="application/did+json",
         retrieved=helping.nowIso8601()
     )
-    didDocumentMetadata = dict()
+    didDocumentMetadata = dict(
+        witnesses=witnesses
+    )
     diddoc = dict(
         id=did,
-        verificationMethod=vms,
-        service=services
+        verificationMethod=vms
     )
 
-    # result = dict(
-    #     didDocument=diddoc,
-    #     didResolutionMetadata=didResolutionMetadata,
-    #     didDocumentMetadata=didDocumentMetadata
-    # )
-
-    return diddoc
+    if metadata is True:
+        resolutionResult = dict(
+            didDocument=diddoc,
+            didResolutionMetadata=didResolutionMetadata,
+            didDocumentMetadata=didDocumentMetadata
+        )
+        return resolutionResult
+    else:
+        return diddoc

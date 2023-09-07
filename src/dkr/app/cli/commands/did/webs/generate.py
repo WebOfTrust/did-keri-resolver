@@ -14,13 +14,13 @@ from keri.help import helping
 
 from dkr.core import didding
 
-parser = argparse.ArgumentParser(description='Resolve a did:keri DID')
+parser = argparse.ArgumentParser(description='Generate a did:webs DID document and KEL/TEL file')
 parser.set_defaults(handler=lambda args: handler(args),
                     transferable=True)
 parser.add_argument('-n', '--name',
                     action='store',
                     default="dkr",
-                    help="Name of controller. Default is kara.")
+                    help="Name of controller. Default is dkr.")
 parser.add_argument('--base', '-b', help='additional optional prefix to file location of KERI keystore',
                     required=False, default="")
 parser.add_argument('--passcode', help='22 character encryption passcode for keystore (is not saved)',
