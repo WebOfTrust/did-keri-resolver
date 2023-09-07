@@ -2,6 +2,13 @@
 
 did:keri/did:webs DID Resolver Reference Implementation
 
+`dkr did keri resolve`
+`dkr did keri resolver-service`
+`dkr did webs generate`
+`dkr did webs service`
+`dkr did webs resolve`
+`dkr did webs resolver-service`
+
 ## did:keri
 
 ### `dkr did keri resolve`
