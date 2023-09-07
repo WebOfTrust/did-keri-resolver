@@ -45,7 +45,7 @@ def parseDIDWebs(did):
     return aid
 
 
-def generateDIDDoc(hby, did, aid, oobi=None):
+def generateDIDDoc(hby, did, aid, oobi=None, metadata=None):
     if oobi is not None:
         obr = hby.db.roobi.get(keys=(oobi,))
         if obr is None or obr.state == oobiing.Result.failed:
@@ -67,30 +67,33 @@ def generateDIDDoc(hby, did, aid, oobi=None):
     x = [(keys[1], loc.url) for keys, loc in
          hby.db.locs.getItemIter(keys=(aid,)) if loc.url]
 
-    services = []
+    witnesses = []
     for idx, eid in enumerate(kever.wits):
         keys = (eid,)
         for (aid, scheme), loc in hby.db.locs.getItemIter(keys):
-            services.append(dict(
-                id=f"{did}#witness-{idx}-{scheme}",
-                type="keri-mailbox",
-                serviceEndpoint=loc.url
+            witnesses.append(dict(
+                idx=idx,
+                scheme=scheme,
+                url=loc.url
             ))
     didResolutionMetadata = dict(
         contentType="application/did+json",
         retrieved=helping.nowIso8601()
     )
-    didDocumentMetadata = dict()
+    didDocumentMetadata = dict(
+        witnesses=witnesses
+    )
     diddoc = dict(
         id=did,
-        verificationMethod=vms,
-        service=services
+        verificationMethod=vms
     )
 
-    # result = dict(
-    #     didDocument=diddoc,
-    #     didResolutionMetadata=didResolutionMetadata,
-    #     didDocumentMetadata=didDocumentMetadata
-    # )
-
-    return diddoc
+    if metadata is True:
+        resolutionResult = dict(
+            didDocument=diddoc,
+            didResolutionMetadata=didResolutionMetadata,
+            didDocumentMetadata=didDocumentMetadata
+        )
+        return resolutionResult
+    else:
+        return diddoc
