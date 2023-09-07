@@ -14,7 +14,7 @@ from keri.app.cli.common import existing
 
 from dkr.core import webbing
 
-parser = argparse.ArgumentParser(description='Launch web server capable of serving KERI AIDs as did:webs DIDs')
+parser = argparse.ArgumentParser(description='Launch web server capable of serving KERI AIDs as did:webs and did:web DIDs')
 parser.set_defaults(handler=lambda args: launch(args),
                     transferable=True)
 parser.add_argument('-p', '--http',
