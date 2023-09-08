@@ -120,7 +120,7 @@ dkr did webs service --name dkr --port 7676
          did:web:dom:123      ---------------------------------
    O    ----------------->   |                                 |
   -|-   <-----------------   |  ANY DID:WEB RESOLVER           |
-  / \    diddoc, metadata    |                                 |
+  / \         diddoc         |                                 |
                               ---------------------------------
 ```
 
@@ -183,7 +183,7 @@ dkr did webs resolve --name dkr --did did:webs:danubetech.com:example:EPaP4GgZsB
          did:web:dom:123     ---------------------------------
    O    ----------------->   |                                 |
   -|-   <-----------------   |  ANY DID:WEB RESOLVER           |
-  / \    diddoc, metadata    |                                 |
+  / \         diddoc         |                                 |
                               ---------------------------------
 ```
 
