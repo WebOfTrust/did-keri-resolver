@@ -101,7 +101,7 @@ dkr did webs service --name dkr --port 7676
 
          did:webs:dom:123     ---------------------------------
    O    ----------------->   |                                 |
-  -|-   <-----------------   |  dkr did webs resolve           |  <-----  (verify did.json/.oobi)
+  -|-   <-----------------   |  ANY DID:WEBS RESOLVER          |  <-----  (verify did.json/.oobi)
   / \    diddoc, metadata    |                                 |
                               ---------------------------------
 ```
