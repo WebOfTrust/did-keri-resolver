@@ -142,7 +142,7 @@ dkr did webs resolve --name dkr --did did:webs:danubetech.com:example:EPaP4GgZsB
                                             HTTPS
                              HTTP GET       ^   |  200 OK
                              /123/did.json  |   |  did.json
-                             /123/did.oobi  |   v  did.kel
+                             /123/did.oobi  |   v  did.oobi
 
          did:webs:dom:123     ---------------------------------
    O    ----------------->   |                                 |
