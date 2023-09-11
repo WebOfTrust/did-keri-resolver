@@ -25,9 +25,9 @@ parser.add_argument('--base', '-b', help='additional optional prefix to file loc
                     required=False, default="")
 parser.add_argument('--passcode', help='22 character encryption passcode for keystore (is not saved)',
                     dest="bran", default=None)  # passcode => bran
-parser.add_argument("--did", "-d", help="DID to resolve", required=True)
+parser.add_argument("--did", "-d", help="DID to resolve (did:keri method)", required=True)
 parser.add_argument("--oobi", "-o", help="OOBI to use for resolving the DID", required=False)
-parser.add_argument("--metadata", "-m", help="Whether to include metadata (True), or only return the DID document (False)", type=bool, required=False, default=False)
+parser.add_argument("--metadata", "-m", help="Whether to include metadata (True), or only return the DID document (False)", type=bool, required=False, default=None)
 
 
 def handler(args):
