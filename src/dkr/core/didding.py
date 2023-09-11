@@ -14,7 +14,7 @@ from keri.app import oobiing
 from keri.core import coring
 
 DID_KERI_RE = re.compile('\\Adid:keri:(?P<aid>[^:]+)\\Z', re.IGNORECASE)
-DID_WEBS_RE = re.compile('\\Adid:webs:(?P<path>.+):(?P<aid>[^:]+)\\Z', re.IGNORECASE)
+DID_WEBS_RE = re.compile('\\Adid:webs:(?P<domain>[^:]+):((?P<path>.+):)?(?P<aid>[^:]+)\\Z', re.IGNORECASE)
 
 def parseDIDKeri(did):
     match = DID_KERI_RE.match(did)
@@ -35,6 +35,8 @@ def parseDIDWebs(did):
     if match is None:
         raise ValueError(f"{did} is not a valid did:webs DID")
 
+    domain = match.group("domain")
+    path = match.group("path")
     aid = match.group("aid")
 
     try:
@@ -42,7 +44,7 @@ def parseDIDWebs(did):
     except Exception as e:
         raise ValueError(f"{aid} is an invalid AID")
 
-    return aid
+    return domain, path, aid
 
 
 def generateDIDDoc(hby, did, aid, oobi=None, metadata=None):
