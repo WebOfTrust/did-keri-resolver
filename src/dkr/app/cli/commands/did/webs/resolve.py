@@ -65,5 +65,3 @@ class Resolver(doing.DoDoer):
         print(data)
         self.remove(self.toRemove)
         return True
-
-
